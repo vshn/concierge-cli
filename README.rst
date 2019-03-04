@@ -63,3 +63,17 @@ List all projects *with* topics now: (double-check)
 .. code-block:: console
 
     $ concierge-cli gitlab topics bar/foo
+
+Print a YAML list of all projects matching a topic:
+
+.. code-block:: console
+
+    $ concierge-cli gitlab projects --topic Puppet
+
+Update the list of modules Concierge manages with a specific configuration:
+
+.. code-block:: console
+
+    $ concierge-cli gitlab projects --topic Puppet > configs/foo-bar/managed_modules.yml
+    $ git add -v configs/foo-bar/managed_modules.yml
+    $ git status && git commit -m 'Added ...' && git push

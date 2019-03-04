@@ -36,3 +36,7 @@ class Project:
         project = self.api.projects.get(self.group_project.id, lazy=True)
         project.tag_list = new_topics
         project.save()
+
+    def __str__(self):
+        """Project name and its namespace"""
+        return self.name

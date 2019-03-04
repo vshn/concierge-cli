@@ -6,7 +6,7 @@ import click
 from gitlab.exceptions import GitlabError
 from requests.exceptions import RequestException
 
-from .manager import DEFAULT_GITLAB_URI, TopicManager
+from .manager import DEFAULT_GITLAB_URI, ProjectManager, TopicManager
 
 
 @click.group()
@@ -65,6 +65,39 @@ def topics(ctx, group_project_filter, empty, set_topic):
         topic_manager.set(list(set_topic))
     else:
         topic_manager.show()
+
+
+@gitlab.command()
+@click.argument('group-project-filter', default='/')
+@click.option('--topic', multiple=True,
+              help='Use multiple times to filter with more than one topic.')
+@click.pass_context
+def projects(ctx, group_project_filter, topic):
+    """
+    List projects on GitLab, optionally by topic.
+
+    Filter syntax:
+
+    - foo/bar ... projects that have "bar" in their name,
+    in groups that have "foo" in their name
+
+    - foo/ ... filter for groups only, match any project
+
+    - /bar ... filter for projects only, match any group
+    """
+    try:
+        group_filter, project_filter = group_project_filter.split('/')
+    except ValueError:
+        group_filter, project_filter = '', group_project_filter
+
+    project_manager = ProjectManager(
+        uri=ctx.obj.get('uri'),
+        token=ctx.obj.get('token'),
+        group_filter=group_filter,
+        project_filter=project_filter,
+        topic_list=list(topic),
+    )
+    project_manager.show()
 
 
 def main():
