@@ -22,8 +22,8 @@ properties of your Git repository projects.  Currently, GitLab is supported.
 
 .. _Concierge: https://hub.docker.com/r/vshn/concierge/
 
-Why I Should I Use This Tool?
------------------------------
+Why Should I Use This Tool?
+---------------------------
 
 Concierge-cli helps you analyze and bulk-update the repository projects you
 manage (e.g. set topics on projects, generate project lists for ModuleSync).

@@ -6,7 +6,8 @@ import click
 from gitlab.exceptions import GitlabError
 from requests.exceptions import RequestException
 
-from .manager import DEFAULT_GITLAB_URI, ProjectManager, TopicManager
+from .constants import GITLAB_DEFAULT_URI
+from .manager import ProjectManager, TopicManager
 
 
 @click.group()
@@ -19,7 +20,7 @@ def concierge_cli():
                             'in a configuration file (see '
                             'https://python-gitlab.readthedocs.io '
                             '> Configuration > Files), default: %s' %
-                            DEFAULT_GITLAB_URI)
+                            GITLAB_DEFAULT_URI)
 @click.option('--token', help='Optional access token. Anonymous access '
                               'if none is supplied.')
 @click.pass_context

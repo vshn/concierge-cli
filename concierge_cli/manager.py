@@ -5,9 +5,7 @@ from gitlab import Gitlab
 from gitlab.config import GitlabConfigMissingError
 
 from .adapter import Project
-
-DEFAULT_GITLAB_URI = 'https://gitlab.com'
-MAX_GROUPS = 999_999
+from .constants import GITLAB_DEFAULT_URI
 
 
 class GitlabAPI:
@@ -27,10 +25,10 @@ class GitlabAPI:
             try:
                 self.api = Gitlab.from_config()
             except GitlabConfigMissingError:
-                uri = DEFAULT_GITLAB_URI
+                uri = GITLAB_DEFAULT_URI
 
         if uri:
-            self.api = Gitlab(uri, private_token=token)
+            self.api = Gitlab(uri, private_token=token, per_page=100)
 
 
 class TopicManager(GitlabAPI):
@@ -53,10 +51,9 @@ class TopicManager(GitlabAPI):
         List all projects and their topics, filtered by an optional
         search pattern.
         """
-        for group in self.api.groups.list(search=self.group_filter,
-                                          per_page=MAX_GROUPS):
+        for group in self.api.groups.list(search=self.group_filter, all=True):
             for group_project in \
-                    group.projects.list(search=self.project_filter):
+                    group.projects.list(search=self.project_filter, all=True):
                 project = Project(self.api, group_project)
                 if (self.empty and not project.topic_count) or \
                         (not self.empty and project.topic_count):
@@ -93,10 +90,9 @@ class ProjectManager(GitlabAPI):
         List all projects and their topics, filtered by an optional
         search pattern.
         """
-        for group in self.api.groups.list(search=self.group_filter,
-                                          per_page=MAX_GROUPS):
+        for group in self.api.groups.list(search=self.group_filter, all=True):
             for group_project in \
-                    group.projects.list(search=self.project_filter):
+                    group.projects.list(search=self.project_filter, all=True):
                 project = Project(self.api, group_project)
                 matched_tags = set(project.topic_list) & set(self.topic_list)
                 if matched_tags or not self.topic_list:
