@@ -6,7 +6,7 @@ import click
 from gitlab.exceptions import GitlabError
 from requests.exceptions import RequestException
 
-from .constants import GITLAB_DEFAULT_URI
+from .constants import GITLAB_DEFAULT_URI, GITLAB_PERMISSIONS
 from .manager import GroupManager, ProjectManager, TopicManager
 
 
@@ -107,8 +107,11 @@ def projects(ctx, group_project_filter, topic):
               help='List only groups that match or contain a specific name.')
 @click.option('--member/--no-member', default=True,
               help='Select groups where user is (not) a member of.')
+@click.option('--set-permission',
+              type=click.Choice(GITLAB_PERMISSIONS.keys()),
+              help='Set user permission level on all matching groups.')
 @click.pass_context
-def groups(ctx, username, group_filter, member):
+def groups(ctx, username, group_filter, member, set_permission):
     """
     Manage the access level for a user on GitLab groups.
     """
@@ -120,7 +123,10 @@ def groups(ctx, username, group_filter, member):
         is_member=member,
         username=username,
     )
-    group_manager.show()
+    if set_permission:
+        group_manager.set(set_permission)
+    else:
+        group_manager.show()
 
 
 def main():

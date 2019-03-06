@@ -5,7 +5,7 @@ from gitlab import Gitlab
 from gitlab.config import GitlabConfigMissingError
 
 from .adapter import GroupMembership, Project
-from .constants import GITLAB_DEFAULT_URI, GITLAB_PERMISSIONS
+from .constants import GITLAB_DEFAULT_URI
 
 
 class GitlabAPI:
@@ -110,11 +110,12 @@ class GroupManager(GitlabAPI):
     """
 
     def __init__(self, group_filter, username, is_member=True,
-                 set_permissions=None, uri=None, token=None):
+                 uri=None, token=None):
         """
         A groups filter by group, project and topic(s).
         """
         super().__init__(uri, token)
+
         users = self.api.users.list(username=username)
         if len(users) != 1:
             raise ValueError('No such user: %s' % username)
@@ -122,8 +123,6 @@ class GroupManager(GitlabAPI):
         self.group_filter = group_filter
         self.user = users[0]
         self.is_member = is_member
-        self.permission_level = GITLAB_PERMISSIONS[set_permissions] \
-            if set_permissions else None
 
     def groups(self):
         """
@@ -144,3 +143,10 @@ class GroupManager(GitlabAPI):
         """
         for group_user in self.groups():
             print(group_user)
+
+    def set(self, permission_name):
+        """
+        Display all found groups and the user's current access level.
+        """
+        for group_user in self.groups():
+            group_user.set_membership(permission_name)

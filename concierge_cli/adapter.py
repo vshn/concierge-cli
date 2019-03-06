@@ -1,7 +1,7 @@
 """
 Concierge repository projects management CLI.
 """
-from .constants import GITLAB_PERMISSION_NAMES
+from .constants import GITLAB_PERMISSION_NAMES, GITLAB_PERMISSIONS
 
 
 class Project:
@@ -52,10 +52,35 @@ class GroupMembership:
         """A GitLab API group, currently."""
         self.group = group
         self.user = user
-        member = self.group.members.get(self.user.id)
-        self.is_member = member is not None
-        self.access_level = 'n/a' if not member else \
-            GITLAB_PERMISSION_NAMES[member.access_level]
+        self.member = self.group.members.get(self.user.id)
+        self.is_member = self.member is not None
+        self.access_level = 'n/a' if not self.member else \
+            GITLAB_PERMISSION_NAMES[self.member.access_level]
+
+    def set_membership(self, permission_name):
+        """Update the user's permissions on the group"""
+        new_access_level = GITLAB_PERMISSIONS[permission_name]
+
+        if self.is_member:
+            if permission_name == self.access_level:
+                return
+
+            print(f"Group {self.group.full_path}: "
+                  f"Updating access level: '{self.access_level}' "
+                  f"-> '{permission_name}'")
+
+            self.member.access_level = new_access_level
+            self.member.save()
+
+        else:
+            print(f"Group {self.group.full_path}: "
+                  f"Adding {self.user.username} "
+                  f"with access level '{permission_name}'")
+
+            self.group.members.create({
+                'user_id': self.user.id,
+                'access_level': new_access_level,
+            })
 
     def __str__(self):
         """Textual information about the group membership"""
