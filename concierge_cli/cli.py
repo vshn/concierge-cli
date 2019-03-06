@@ -7,7 +7,7 @@ from gitlab.exceptions import GitlabError
 from requests.exceptions import RequestException
 
 from .constants import GITLAB_DEFAULT_URI
-from .manager import ProjectManager, TopicManager
+from .manager import GroupManager, ProjectManager, TopicManager
 
 
 @click.group()
@@ -101,6 +101,28 @@ def projects(ctx, group_project_filter, topic):
     project_manager.show()
 
 
+@gitlab.command()
+@click.argument('username')
+@click.option('--group-filter', default='',
+              help='List only groups that match or contain a specific name.')
+@click.option('--member/--no-member', default=True,
+              help='Select groups where user is (not) a member of.')
+@click.pass_context
+def groups(ctx, username, group_filter, member):
+    """
+    Manage the access level for a user on GitLab groups.
+    """
+
+    group_manager = GroupManager(
+        uri=ctx.obj.get('uri'),
+        token=ctx.obj.get('token'),
+        group_filter=group_filter,
+        is_member=member,
+        username=username,
+    )
+    group_manager.show()
+
+
 def main():
     """Main entry point for the CLI"""
     try:
@@ -109,6 +131,8 @@ def main():
         raise SystemExit('%s (GitLab)' % err.error_message)
     except RequestException as req:
         raise SystemExit(req)
+    except Exception as other:
+        raise SystemExit(other)
 
 
 if __name__ == '__main__':
