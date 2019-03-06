@@ -38,9 +38,7 @@ setup(
         'Programming Language :: Python :: 3.7',
     ],
     python_requires='>=3.6',
-    install_requires=[
-        'Click',
-    ],
+    install_requires=read_file('requirements.in'),
     entry_points={
         'console_scripts': [
             'concierge-cli = concierge_cli.cli:main',
