@@ -1,6 +1,7 @@
 """
 Concierge repository projects management CLI.
 """
+from .constants import GITLAB_PERMISSION_NAMES
 
 
 class Project:
@@ -40,3 +41,24 @@ class Project:
     def __str__(self):
         """Project name and its namespace"""
         return self.name
+
+
+class GroupMembership:
+    """
+    Adapter wrapping a group from a repository service API
+    """
+
+    def __init__(self, group, user):
+        """A GitLab API group, currently."""
+        self.group = group
+        self.user = user
+        member = self.group.members.get(self.user.id)
+        self.is_member = member is not None
+        self.access_level = 'n/a' if not member else \
+            GITLAB_PERMISSION_NAMES[member.access_level]
+
+    def __str__(self):
+        """Textual information about the group membership"""
+        return f"Group {self.group.full_path}: " \
+               f"{self.user.username} has " \
+               f"access level '{self.access_level}'"

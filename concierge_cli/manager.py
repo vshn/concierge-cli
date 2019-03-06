@@ -4,8 +4,8 @@ Concierge repository projects management CLI.
 from gitlab import Gitlab
 from gitlab.config import GitlabConfigMissingError
 
-from .adapter import Project
-from .constants import GITLAB_DEFAULT_URI
+from .adapter import GroupMembership, Project
+from .constants import GITLAB_DEFAULT_URI, GITLAB_PERMISSIONS
 
 
 class GitlabAPI:
@@ -102,3 +102,45 @@ class ProjectManager(GitlabAPI):
         """Display all found projects as a YAML list."""
         for project in self.projects():
             print(f"- {project}")
+
+
+class GroupManager(GitlabAPI):
+    """
+    Manages permissions for users on GitLab project groups (= namespaces).
+    """
+
+    def __init__(self, group_filter, username, is_member=True,
+                 set_permissions=None, uri=None, token=None):
+        """
+        A groups filter by group, project and topic(s).
+        """
+        super().__init__(uri, token)
+        users = self.api.users.list(username=username)
+        if len(users) != 1:
+            raise ValueError('No such user: %s' % username)
+
+        self.group_filter = group_filter
+        self.user = users[0]
+        self.is_member = is_member
+        self.permission_level = GITLAB_PERMISSIONS[set_permissions] \
+            if set_permissions else None
+
+    def groups(self):
+        """
+        List all groups and the current access level for our user,
+        filtered by an optional search pattern.
+        """
+        for group in self.api.groups.list(search=self.group_filter, all=True):
+
+            group_user = GroupMembership(group, self.user)
+
+            if (not group_user.is_member and not self.is_member) or \
+                    (group_user.is_member and self.is_member):
+                yield group_user
+
+    def show(self):
+        """
+        Display all found groups and the user's current access level.
+        """
+        for group_user in self.groups():
+            print(group_user)
