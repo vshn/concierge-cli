@@ -13,7 +13,7 @@ class GitlabAPI:
     Establishes an API connection to a GitLab instance.
     """
 
-    def __init__(self, uri=None, token=None):
+    def __init__(self, uri, token, insecure):
         """
         Connects to a GitLab instance using connection details from one of the
         local configuration files (see https://python-gitlab.readthedocs.io >
@@ -30,6 +30,13 @@ class GitlabAPI:
         if uri:
             self.api = Gitlab(uri, private_token=token, per_page=100)
 
+        if insecure:
+            from warnings import filterwarnings
+            from urllib3.exceptions import InsecureRequestWarning
+
+            filterwarnings('ignore', category=InsecureRequestWarning)
+            self.api.ssl_verify = False
+
 
 class TopicManager(GitlabAPI):
     """
@@ -37,11 +44,11 @@ class TopicManager(GitlabAPI):
     """
 
     def __init__(self, group_filter, project_filter, empty,
-                 uri=None, token=None):
+                 uri=None, token=None, insecure=False):
         """
         A topics filter by group, project and topic state (set or not set).
         """
-        super().__init__(uri, token)
+        super().__init__(uri, token, insecure)
         self.group_filter = group_filter
         self.project_filter = project_filter
         self.empty = empty
@@ -76,11 +83,11 @@ class ProjectManager(GitlabAPI):
     """
 
     def __init__(self, group_filter, project_filter, topic_list,
-                 uri=None, token=None):
+                 uri=None, token=None, insecure=False):
         """
         A projects filter by group, project and topic(s).
         """
-        super().__init__(uri, token)
+        super().__init__(uri, token, insecure)
         self.group_filter = group_filter
         self.project_filter = project_filter
         self.topic_list = topic_list
@@ -110,11 +117,11 @@ class GroupManager(GitlabAPI):
     """
 
     def __init__(self, group_filter, username, is_member=True,
-                 uri=None, token=None):
+                 uri=None, token=None, insecure=False):
         """
         A groups filter by group, project and topic(s).
         """
-        super().__init__(uri, token)
+        super().__init__(uri, token, insecure)
 
         users = self.api.users.list(username=username)
         if len(users) != 1:

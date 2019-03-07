@@ -23,10 +23,12 @@ def concierge_cli():
                             GITLAB_DEFAULT_URI)
 @click.option('--token', help='Optional access token. Anonymous access '
                               'if none is supplied.')
+@click.option('--insecure/--no-insecure',
+              help='Disable SSL certificate check and related warnings.')
 @click.pass_context
-def gitlab(ctx, uri, token):
+def gitlab(ctx, uri, token, insecure):
     """GitLab sub-commands."""
-    ctx.obj = dict(uri=uri, token=token)
+    ctx.obj = dict(uri=uri, token=token, insecure=insecure)
 
 
 @gitlab.command()
@@ -58,6 +60,7 @@ def topics(ctx, group_project_filter, empty, set_topic):
     topic_manager = TopicManager(
         uri=ctx.obj.get('uri'),
         token=ctx.obj.get('token'),
+        insecure=ctx.obj.get('insecure'),
         group_filter=group_filter,
         project_filter=project_filter,
         empty=empty,
@@ -94,6 +97,7 @@ def projects(ctx, group_project_filter, topic):
     project_manager = ProjectManager(
         uri=ctx.obj.get('uri'),
         token=ctx.obj.get('token'),
+        insecure=ctx.obj.get('insecure'),
         group_filter=group_filter,
         project_filter=project_filter,
         topic_list=list(topic),
@@ -119,6 +123,7 @@ def groups(ctx, username, group_filter, member, set_permission):
     group_manager = GroupManager(
         uri=ctx.obj.get('uri'),
         token=ctx.obj.get('token'),
+        insecure=ctx.obj.get('insecure'),
         group_filter=group_filter,
         is_member=member,
         username=username,
