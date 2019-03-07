@@ -10,7 +10,7 @@ GITLAB_PERMISSIONS = {
     'developer': gitlab.DEVELOPER_ACCESS,
     'reporter': gitlab.REPORTER_ACCESS,
     'guest': gitlab.GUEST_ACCESS,
-    'none': 0,
+    'none': None,
 }
 GITLAB_PERMISSION_NAMES = {
     gitlab.OWNER_ACCESS: 'owner',
@@ -18,5 +18,5 @@ GITLAB_PERMISSION_NAMES = {
     gitlab.DEVELOPER_ACCESS: 'developer',
     gitlab.REPORTER_ACCESS: 'reporter',
     gitlab.GUEST_ACCESS: 'guest',
-    0: 'none',
+    None: 'none',
 }

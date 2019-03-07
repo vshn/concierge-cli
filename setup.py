@@ -11,8 +11,7 @@ import concierge_cli as package
 
 def read_file(filename):
     """Get the contents of a file"""
-    here = abspath(dirname(__file__))
-    with open(join(here, filename)) as file:
+    with open(join(abspath(dirname(__file__)), filename)) as file:
         return file.read()
 
 
