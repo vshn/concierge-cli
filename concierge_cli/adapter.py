@@ -1,6 +1,8 @@
 """
 Concierge repository projects management CLI.
 """
+from gitlab import GitlabGetError
+
 from .constants import GITLAB_PERMISSION_NAMES, GITLAB_PERMISSIONS
 
 
@@ -52,10 +54,18 @@ class GroupMembership:
         """A GitLab API group, currently."""
         self.group = group
         self.user = user
-        self.member = self.group.members.get(self.user.id)
-        self.is_member = self.member is not None
-        self.access_level = 'n/a' if not self.member else \
-            GITLAB_PERMISSION_NAMES[self.member.access_level]
+        try:
+            self.member = self.group.members.get(self.user.id)
+        except GitlabGetError as err:
+            if err.response_code != 404:
+                raise
+            self.member = None
+            self.is_member = False
+            self.access_level = None
+        else:
+            self.is_member = True
+            self.access_level = \
+                GITLAB_PERMISSION_NAMES[self.member.access_level]
 
     def set_membership(self, permission_name):
         """Update the user's permissions on the group"""
@@ -69,8 +79,11 @@ class GroupMembership:
                   f"Updating access level: '{self.access_level}' "
                   f"-> '{permission_name}'")
 
-            self.member.access_level = new_access_level
-            self.member.save()
+            if permission_name == GITLAB_PERMISSION_NAMES[None]:
+                self.member.delete()
+            else:
+                self.member.access_level = new_access_level
+                self.member.save()
 
         else:
             print(f"Group {self.group.full_path}: "
@@ -84,6 +97,9 @@ class GroupMembership:
 
     def __str__(self):
         """Textual information about the group membership"""
+        access_level = \
+            f"has access level '{self.access_level}'" \
+            if self.is_member else 'is not a member.'
+
         return f"Group {self.group.full_path}: " \
-               f"{self.user.username} has " \
-               f"access level '{self.access_level}'"
+               f"{self.user.username} {access_level}"

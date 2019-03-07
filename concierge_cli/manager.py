@@ -146,7 +146,7 @@ class GroupManager(GitlabAPI):
 
     def set(self, permission_name):
         """
-        Display all found groups and the user's current access level.
+        Ensure the user has privileges to access the selected groups.
         """
         for group_user in self.groups():
             group_user.set_membership(permission_name)
