@@ -40,6 +40,16 @@ From PyPI:
 Usage Patterns
 --------------
 
+#. Manage `project topics`_
+#. List projects by topic
+#. Manage `group membership`_ and permissions
+
+.. _project topics: https://docs.gitlab.com/ce/user/project/settings/
+.. _group membership: https://docs.gitlab.com/ce/user/group/#add-users-to-a-group
+
+Manage topics
+^^^^^^^^^^^^^
+
 List all projects (for a private GitLab) that have no topics yet:
 
 .. code-block:: console
@@ -64,6 +74,9 @@ List all projects *with* topics now: (double-check)
 
     $ concierge-cli gitlab topics bar/foo
 
+List projects
+^^^^^^^^^^^^^
+
 Print a YAML list of all projects matching a topic:
 
 .. code-block:: console
@@ -77,3 +90,38 @@ Update the list of modules Concierge manages with a specific configuration:
     $ concierge-cli gitlab projects --topic Puppet > configs/foo-bar/managed_modules.yml
     $ git add -v configs/foo-bar/managed_modules.yml
     $ git status && git commit -m 'Added ...' && git push
+
+Group membership
+^^^^^^^^^^^^^^^^
+
+**Preparation:** You need an `access token`_ of an administrator user to
+list all groups and make changes to any group membership.
+
+.. _access token: https://gitlab.com/profile/personal_access_tokens
+
+List all groups where user is not yet a member of:
+
+.. code-block:: console
+
+    $ concierge-cli gitlab --token *s3cr3t* groups --no-member my.user.name
+
+Add user to all those groups:
+
+.. code-block:: console
+
+    $ concierge-cli gitlab --token *s3cr3t* groups --no-member my.user.name \
+                           --set-permission maintainer
+
+List a user's group memberships and permissions:
+
+.. code-block:: console
+
+    $ concierge-cli gitlab --token *s3cr3t* groups my.user.name
+
+Remove a user from selected groups:
+
+.. code-block:: console
+
+    $ concierge-cli gitlab --token *s3cr3t* groups my.user.name \
+                           --group-filter a-group-name \
+                           --set-permission none
