@@ -1,7 +1,7 @@
 Concierge-cli |latest-version|
 ==============================
 
-|build-status| |python-support| |license|
+|build-status| |updates| |python-support| |license|
 
 Companion CLI for `Concierge`_, the Configuration management & CI solution
 for aligning your multitude of Git repositories.  Allows you to bulk-manage
@@ -13,6 +13,9 @@ properties of your Git repository projects.  Currently, GitLab is supported.
 .. |build-status| image:: https://img.shields.io/travis/vshn/concierge-cli/master.svg
    :alt: Build status
    :target: https://travis-ci.org/vshn/concierge-cli
+.. |updates| image:: https://pyup.io/repos/github/vshn/concierge-cli/shield.svg
+   :target: https://pyup.io/repos/github/vshn/concierge-cli
+   :alt: Updates
 .. |python-support| image:: https://img.shields.io/pypi/pyversions/concierge-cli.svg
    :alt: Python versions
    :target: https://pypi.org/project/concierge-cli
