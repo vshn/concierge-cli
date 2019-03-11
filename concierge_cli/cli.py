@@ -11,6 +11,7 @@ from .manager import GroupManager, ProjectManager, TopicManager
 
 
 @click.group()
+@click.version_option()
 def concierge_cli():
     """Concierge repository projects management CLI."""
 

@@ -4,6 +4,7 @@ Tests for concierge-cli's command line interface (CLI)
 import os
 import pytest
 
+from click.testing import CliRunner
 from gitlab.exceptions import GitlabError
 from requests.exceptions import RequestException
 from unittest.mock import patch
@@ -11,11 +12,21 @@ from unittest.mock import patch
 import concierge_cli.cli
 
 
+def launch_cli(*args):
+    """
+    Helper for testing the click CLI.
+    See https://click.palletsprojects.com/en/7.x/testing/
+    """
+    runner = CliRunner()
+    result = runner.invoke(concierge_cli.cli.concierge_cli, args)
+    return result
+
+
 def test_entrypoint():
     """
     Is entrypoint script installed? (setup.py)
     """
-    exit_status = os.system('concierge-cli --help')
+    exit_status = os.system('concierge-cli --version')
     assert exit_status == 0
 
 
@@ -35,6 +46,24 @@ def test_gitlab_groups_command():
     assert exit_status == 0
 
 
+@patch('concierge_cli.cli.GroupManager')
+def test_gitlab_groups_show(mock_manager):
+    """
+    Does groups command run the manager's show method? (by default)
+    """
+    launch_cli('gitlab', 'groups', 'foo-user')
+    assert mock_manager().show.called
+
+
+@patch('concierge_cli.cli.GroupManager')
+def test_gitlab_groups_set(mock_manager):
+    """
+    Does groups set option run the manager method?
+    """
+    launch_cli('gitlab', 'groups', 'foo-user', '--set-permission', 'none')
+    assert mock_manager().set.called
+
+
 def test_gitlab_projects_command():
     """
     Is subcommand available?
@@ -43,12 +72,39 @@ def test_gitlab_projects_command():
     assert exit_status == 0
 
 
+@patch('concierge_cli.cli.ProjectManager')
+def test_gitlab_projects_show(mock_manager):
+    """
+    Does projects command run the manager's show method?
+    """
+    launch_cli('gitlab', 'projects', 'some/project', '--topic', 'foo')
+    assert mock_manager().show.called
+
+
 def test_gitlab_topics_command():
     """
     Is subcommand available?
     """
     exit_status = os.system('concierge-cli gitlab topics --help')
     assert exit_status == 0
+
+
+@patch('concierge_cli.cli.TopicManager')
+def test_gitlab_topics_show(mock_manager):
+    """
+    Does topics command run the manager's show method? (by default)
+    """
+    launch_cli('gitlab', 'topics', 'some/project')
+    assert mock_manager().show.called
+
+
+@patch('concierge_cli.cli.TopicManager')
+def test_gitlab_topics_set(mock_manager):
+    """
+    Does topics set option run the manager method?
+    """
+    launch_cli('gitlab', 'topics', 'some/project', '--set-topic', 'foo')
+    assert mock_manager().set.called
 
 
 @patch('concierge_cli.cli.concierge_cli', side_effect=GitlabError)
