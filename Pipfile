@@ -4,9 +4,12 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 
 [dev-packages]
-pylint = "*"
-flake8 = "*"
 pip-tools = "*"
+bandit = "*"
+flake8 = "*"
+pylint = "*"
+pytest = "*"
+tox = "*"
 
 [packages]
 python-gitlab = "*"
