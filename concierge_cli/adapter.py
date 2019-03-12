@@ -40,6 +40,9 @@ class Project:
         project.tag_list = new_topics
         project.save()
 
+        self.topic_list = new_topics
+        self.topic_count = len(new_topics)
+
     def __str__(self):
         """Project name and its namespace"""
         return self.name
