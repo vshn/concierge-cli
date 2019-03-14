@@ -27,7 +27,7 @@ setup(
     url=package.__url__,
     packages=find_packages(exclude=['test*']),
     include_package_data=True,
-    keywords=['cli', 'gitlab', 'management'],
+    keywords=['cli', 'gitlab', 'maintenance'],
     classifiers=[
         'Development Status :: 4 - Beta',
         'Intended Audience :: Developers',

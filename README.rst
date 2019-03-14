@@ -43,6 +43,16 @@ From PyPI:
 
     $ pip install concierge-cli
 
+**Note:** You need Python >= 3.6, otherwise your installation will not
+succeed. (We're doing this really just for Python's awesome f-strings!)
+You can use Pipenv to work around this limitation:
+
+.. code-block:: console
+
+    $ pip install pipenv
+    $ pipenv shell --three
+    $ pip install concierge-cli
+
 Usage Patterns
 --------------
 
