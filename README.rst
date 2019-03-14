@@ -70,7 +70,7 @@ List all projects (for a private GitLab) that have no topics yet:
 
 .. code-block:: console
 
-    $ concierge-cli gitlab --uri git.vs.hn topics --empty
+    $ concierge-cli gitlab --uri https://git.vs.hn topics --empty
 
 List all projects "foo" or similar in group "bar" or similar: (on GitLab.com)
 
