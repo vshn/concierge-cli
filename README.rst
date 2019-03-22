@@ -16,8 +16,7 @@ properties of your Git repository projects.  Currently, GitLab is supported.
 .. |health| image:: https://img.shields.io/codacy/grade/363c38ca95b941438b442afb64591892/master.svg
    :target: https://www.codacy.com/app/VSHN/concierge-cli
    :alt: Code health
-.. |updates| image:: https://pyup.io/repos/github/vshn/concierge-cli/shield.svg
-   :target: https://pyup.io/repos/github/vshn/concierge-cli
+.. |updates| image:: https://badges.renovateapi.com/github/vshn/concierge-cli
    :alt: Updates
 .. |python-support| image:: https://img.shields.io/pypi/pyversions/concierge-cli.svg
    :alt: Python versions
