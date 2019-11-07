@@ -16,7 +16,7 @@ def read_file(filename):
 
 
 setup(
-    name='concierge-cli',
+    name=package.__name__.replace('_', '-'),
     version=package.__version__,
     license=package.__license__,
     author=package.__author__,
