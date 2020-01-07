@@ -12,6 +12,14 @@ from unittest.mock import patch
 import concierge_cli.cli
 
 
+def test_runas_module():
+    """
+    Can this package be run as a Python module?
+    """
+    exit_status = os.system('python -m concierge_cli')
+    assert exit_status == 0
+
+
 def launch_cli(*args):
     """
     Helper for testing the click CLI.
