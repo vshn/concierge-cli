@@ -31,6 +31,7 @@ class GitlabAPI:
             self.api = Gitlab(uri, private_token=token, per_page=100)
 
         if insecure:
+            # pylint: disable=import-outside-toplevel
             from warnings import filterwarnings
             from urllib3.exceptions import InsecureRequestWarning
 
