@@ -10,5 +10,5 @@ click==7.0
 idna==2.8                 # via requests
 python-gitlab==1.15.0
 requests==2.22.0          # via python-gitlab
-six==1.13.0               # via python-gitlab
-urllib3==1.25.7           # via requests
+six==1.14.0               # via python-gitlab
+urllib3==1.25.8           # via requests
