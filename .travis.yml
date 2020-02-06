@@ -1,15 +1,10 @@
+os: linux
 dist: xenial
-sudo: required
-
 language: python
 python:
   - 3.6
   - 3.7
   - 3.8
-
-matrix:
-  allow_failures:
-    - env: TOXENV=pylint
 
 install:
   - pip install tox-travis
@@ -22,6 +17,8 @@ stages:
   - deploy
 
 jobs:
+  allow_failures:
+    - env: TOXENV=pylint
   include:
     - { stage: lint, python: 3.7, env: TOXENV=flake8 }
     - { stage: lint, python: 3.7, env: TOXENV=pylint }
