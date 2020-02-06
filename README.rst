@@ -43,7 +43,7 @@ From PyPI:
     $ pip install concierge-cli
 
 **Note:** You need Python >= 3.6, otherwise your installation will not
-succeed. (We're doing this really just for Python's awesome f-strings!)
+succeed (`python-gitlab`_ v2.0.0 dropped support for older Pythons).
 You can use Pipenv to work around this limitation:
 
 .. code-block:: console
@@ -51,6 +51,8 @@ You can use Pipenv to work around this limitation:
     $ pip install pipenv
     $ pipenv shell --three
     $ pip install concierge-cli
+
+.. _python-gitlab: https://pypi.org/project/python-gitlab/
 
 Usage Patterns
 --------------
