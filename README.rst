@@ -112,33 +112,44 @@ Group membership
 ^^^^^^^^^^^^^^^^
 
 **Preparation:** You need an `access token`_ of an administrator user to
-list all groups and make changes to any group membership.
+list all groups and make changes to any group membership. You may also want
+to `disable notifications`_ of the user(s) you plan to perform bulk updates
+on, to avoid sending out a massive amount of emails.
 
 .. _access token: https://gitlab.com/profile/personal_access_tokens
+.. _disable notifications: https://gitlab.com/profile/notifications
+
+Set the GitLab URI and TOKEN as environment variables (if you want to avoid
+using the ``--token`` and/or ``--uri`` options):
+
+.. code-block:: console
+
+    $ export CONCIERGE_GITLAB_URI=https://git.example.com/
+    $ export CONCIERGE_GITLAB_TOKEN=<redacted>
 
 List all groups where user is not yet a member of:
 
 .. code-block:: console
 
-    $ concierge-cli gitlab --token *s3cr3t* groups --no-member my.user.name
+    $ concierge-cli gitlab groups --no-member my.user.name
 
 Add user to all those groups:
 
 .. code-block:: console
 
-    $ concierge-cli gitlab --token *s3cr3t* groups --no-member my.user.name \
+    $ concierge-cli gitlab groups --no-member my.user.name \
                            --set-permission maintainer
 
 List a user's group memberships and permissions:
 
 .. code-block:: console
 
-    $ concierge-cli gitlab --token *s3cr3t* groups my.user.name
+    $ concierge-cli gitlab groups my.user.name
 
 Remove a user from selected groups:
 
 .. code-block:: console
 
-    $ concierge-cli gitlab --token *s3cr3t* groups my.user.name \
+    $ concierge-cli gitlab groups my.user.name \
                            --group-filter a-group-name \
                            --set-permission none
