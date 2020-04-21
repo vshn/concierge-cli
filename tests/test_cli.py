@@ -4,10 +4,11 @@ Tests for concierge-cli's command line interface (CLI)
 import os
 import pytest
 
+from cli_test_helpers import EnvironContext
 from click.testing import CliRunner
 from gitlab.exceptions import GitlabError
 from requests.exceptions import RequestException
-from unittest.mock import patch
+from unittest.mock import call, patch
 
 import concierge_cli.cli
 
@@ -70,6 +71,24 @@ def test_gitlab_groups_set(mock_manager):
     """
     launch_cli('gitlab', 'groups', 'foo-user', '--set-permission', 'none')
     assert mock_manager().set.called
+
+
+@patch('concierge_cli.cli.GroupManager')
+def test_gitlab_envvars(mock_manager):
+    """
+    Do env variables set the related values?
+    """
+    expected_call = call(
+        group_filter='', insecure=False, is_member=False,
+        token='secret-access-token',
+        uri='https://git.example.com/',
+        username='my.user.name')
+
+    with EnvironContext(CONCIERGE_GITLAB_TOKEN='secret-access-token'), \
+            EnvironContext(CONCIERGE_GITLAB_URI='https://git.example.com/'):
+        launch_cli('gitlab', 'groups', '--no-member', 'my.user.name')
+
+    assert mock_manager.mock_calls[0] == expected_call
 
 
 def test_gitlab_projects_command():

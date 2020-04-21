@@ -17,13 +17,16 @@ def concierge_cli():
 
 
 @concierge_cli.group()
-@click.option('--uri', help='Location of GitLab host, unless specified '
-                            'in a configuration file (see '
-                            'https://python-gitlab.readthedocs.io '
-                            '> Configuration > Files), default: %s' %
-                            GITLAB_DEFAULT_URI)
-@click.option('--token', help='Optional access token. Anonymous access '
-                              'if none is supplied.')
+@click.option('--uri', envvar='CONCIERGE_GITLAB_URI',
+              help='Location of the GitLab host (default: %s). Alternatively,'
+                   ' you may set the CONCIERGE_GITLAB_URI environment'
+                   ' variable, or specify a host in a configuration file (see'
+                   ' https://python-gitlab.readthedocs.io > CLI usage >'
+                   ' Configuration > Files).' % GITLAB_DEFAULT_URI)
+@click.option('--token', envvar='CONCIERGE_GITLAB_TOKEN',
+              help='Optional access token (access is anonymous if none is'
+                   ' supplied). Alternatively, you may set the'
+                   ' CONCIERGE_GITLAB_TOKEN environment variable.')
 @click.option('--insecure/--no-insecure',
               help='Disable SSL certificate check and related warnings.')
 @click.pass_context
@@ -37,8 +40,8 @@ def gitlab(ctx, uri, token, insecure):
 @click.option('--empty/--no-empty', default=False,
               help='Select projects with an empty (or non-empty) topic list.')
 @click.option('--set-topic', multiple=True,
-              help='Use multiple times to set more than one topic. '
-                   'Use "" to clear topics.')
+              help='Use multiple times to set more than one topic.'
+                   ' Use "" to clear topics.')
 @click.pass_context
 def topics(ctx, group_project_filter, empty, set_topic):
     """
