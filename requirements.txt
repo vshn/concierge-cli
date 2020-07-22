@@ -10,4 +10,4 @@ click==7.1.2              # via -r requirements.in
 idna==2.10                # via requests
 python-gitlab==2.4.0      # via -r requirements.in
 requests==2.24.0          # via python-gitlab
-urllib3==1.25.9           # via requests
+urllib3==1.25.10           # via requests
