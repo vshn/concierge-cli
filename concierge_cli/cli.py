@@ -143,11 +143,11 @@ def main():
     try:
         concierge_cli()
     except GitlabError as err:
-        raise SystemExit('%s (GitLab)' % err.error_message)
+        raise SystemExit('%s 💣 GitLab error. Aborting.' % err.error_message)
     except RequestException as req:
-        raise SystemExit(req)
+        raise SystemExit('%s 💣 Communication error. Aborting.' % req)
     except Exception as other:
-        raise SystemExit(other)
+        raise SystemExit('%s 💣 Application error. Aborting.' % other)
 
 
 if __name__ == '__main__':
