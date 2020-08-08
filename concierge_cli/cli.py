@@ -7,7 +7,9 @@ from gitlab.exceptions import GitlabError
 from requests.exceptions import RequestException
 
 from .constants import GITLAB_DEFAULT_URI, GITLAB_PERMISSIONS
-from .manager import GroupManager, ProjectManager, TopicManager
+from .manager import (
+    GroupManager, MergeRequestManager, ProjectManager, TopicManager
+)
 
 
 @click.group()
@@ -73,6 +75,45 @@ def topics(ctx, group_project_filter, empty, set_topic):
         topic_manager.set(list(set_topic))
     else:
         topic_manager.show()
+
+
+@gitlab.command()
+@click.argument('group-project-filter', default='/')
+@click.option('--label', multiple=True,
+              help='Use multiple times to filter with more than one label.')
+@click.option('--merge', default='no', show_default=True,
+              type=click.Choice(['yes', 'no', 'automatic']),
+              help='Merge all identified merge requests. With "yes", will '
+                   'ask for confirmation interactively on each MR.')
+@click.pass_context
+def mrs(ctx, group_project_filter, label, merge):
+    """
+    List and manage merge requests of GitLab projects.
+
+    Filter syntax:
+
+    - foo/bar ... projects that have "bar" in their name,
+    in groups that have "foo" in their name
+
+    - foo/ ... filter for groups only, match any project
+
+    - /bar ... filter for projects only, match any group
+    """
+    try:
+        group_filter, project_filter = group_project_filter.split('/')
+    except ValueError:
+        group_filter, project_filter = '', group_project_filter
+
+    mr_manager = MergeRequestManager(
+        uri=ctx.obj.get('uri'),
+        token=ctx.obj.get('token'),
+        insecure=ctx.obj.get('insecure'),
+        group_filter=group_filter,
+        project_filter=project_filter,
+        labels=list(label),
+        merge=merge,
+    )
+    mr_manager.show()
 
 
 @gitlab.command()

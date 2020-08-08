@@ -1,11 +1,10 @@
 """
 Tests for concierge-cli's adapter classes
 """
-from gitlab.v4.objects import (
-    # Group as Gitlab_Group,
-    # GroupMember as Gitlab_GroupMember,
-    Project as Gitlab_Project,
-)
+# from gitlab.v4.objects import (
+#     Group as Gitlab_Group,
+#     GroupMember as Gitlab_GroupMember,
+# )
 from unittest.mock import Mock, patch
 
 from concierge_cli.manager import GitlabAPI
@@ -27,14 +26,14 @@ def mock_group_project():
     return group_project
 
 
-def mock_gitlab_api_projects():
+def mock_gitlab_api_projects(save=None, mergerequests_list=None):
     """A pseudo mock"""
-    def save():
-        pass
-
     def get(*args, **kwargs):
         project = Mock('gitlab.v4.objects.Project')
         project.save = save
+        project.mergerequests = \
+            Mock('gitlab.v4.objects.ProjectMergeRequestManager')
+        project.mergerequests.list = mergerequests_list
         return project
 
     with patch('gitlab.Gitlab'):
@@ -48,21 +47,33 @@ def mock_gitlab_api_projects():
 def test_project_set_topics(mock_project):
     """
     Are project topics updated on the API endpoint and the object?
-    # TODO: verify that project.save() is called
     """
     # start with no topics
-    project = Project(api=mock_gitlab_api_projects(),
+    mock_save = Mock()
+    project = Project(api=mock_gitlab_api_projects(save=mock_save),
                       project=mock_group_project())
     assert project.topic_list == []
     assert project.topic_count == 0
 
     new_topics = ['foo', 'bar', 'test:baz']
 
-    with patch.object(Gitlab_Project, 'save'):  # as mock_save:
-        project.set_topics(new_topics)
-        # assert mock_save.called
-        assert project.topic_list == new_topics
-        assert project.topic_count == len(new_topics)
+    project.set_topics(new_topics)
+    assert mock_save.called
+    assert project.topic_list == new_topics
+    assert project.topic_count == len(new_topics)
+
+
+def test_project_get_mergerequests():
+    """
+    Does method invoke list() on the API's mergerequests manager?
+    """
+    mock_mergerequests_list = Mock()
+    project = Project(api=mock_gitlab_api_projects(
+                          mergerequests_list=mock_mergerequests_list),
+                      project=mock_group_project())
+
+    project.get_mergerequests()
+    assert mock_mergerequests_list.called
 
 
 def test_groupmembership_join():

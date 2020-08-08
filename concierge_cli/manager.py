@@ -78,6 +78,52 @@ class TopicManager(GitlabAPI):
             project.set_topics(new_topics)
 
 
+class MergeRequestManager(GitlabAPI):
+    """
+    Retrieves information about GitLab merge requests and allows to perform
+    actions on them.
+    """
+
+    def __init__(self, group_filter, project_filter, labels, merge,
+                 uri=None, token=None, insecure=False):
+        """
+        A collection of merge requests filtered by group, project and topic(s).
+        """
+        super().__init__(uri, token, insecure)
+        self.group_filter = group_filter
+        self.project_filter = project_filter
+        self.labels = labels
+        self.merge = merge
+
+    def merge_requests(self):
+        """
+        Fetch a list all merge requests from all projects that match the
+        optional search pattern and labels.
+        """
+        mr_list = []
+
+        for group in self.api.groups.list(search=self.group_filter, all=True):
+            for group_project in \
+                    group.projects.list(search=self.project_filter, all=True):
+                project = Project(self.api, group_project)
+                mr_list += project.get_mergerequests(labels=self.labels)
+
+        return mr_list
+
+    def show(self):
+        """Display all merge requests found with some status information."""
+        if self.labels:
+            print("Open merge requests matching labels: %s" %
+                  ",".join(self.labels))
+        else:
+            print("Open merge requests:")
+
+        # pylint: disable=invalid-name
+        for mr in self.merge_requests():
+            print(f"{'✓' if mr.merge_status == 'can_be_merged' else '✗'}"
+                  f" {mr.references['full']}: {mr.title}")
+
+
 class ProjectManager(GitlabAPI):
     """
     Retrieves information about GitLab projects.

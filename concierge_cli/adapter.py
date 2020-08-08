@@ -19,6 +19,9 @@ class Project:
         self.topic_count = len(self.topic_list)
         self.api = api
 
+        # a full-featured project (a group project has limited features)
+        self.project = self.api.projects.get(self.group_project.id, lazy=True)
+
     def show_topics(self):
         """Display the project name and project topics"""
         if self.topic_count:
@@ -35,13 +38,17 @@ class Project:
         else:
             print(f"Setting new topics on {self.name}: {new_topics}")
 
-        # get a full-featured project (a group project has limited features)
-        project = self.api.projects.get(self.group_project.id, lazy=True)
-        project.tag_list = new_topics
-        project.save()
+        self.project.tag_list = new_topics
+        self.project.save()
 
         self.topic_list = new_topics
         self.topic_count = len(new_topics)
+
+    def get_mergerequests(self, state='opened', labels=(), wip='no'):
+        """Return a list of the project's merge requests"""
+        return self.project.mergerequests.list(state=state,
+                                               labels=labels,
+                                               wip=wip)
 
     def __str__(self):
         """Project name and its namespace"""

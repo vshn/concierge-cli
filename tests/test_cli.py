@@ -91,6 +91,23 @@ def test_gitlab_envvars(mock_manager):
     assert mock_manager.mock_calls[0] == expected_call
 
 
+def test_gitlab_mrs_command():
+    """
+    Is subcommand available?
+    """
+    exit_status = os.system('concierge-cli gitlab mrs --help')
+    assert exit_status == 0
+
+
+@patch('concierge_cli.cli.MergeRequestManager')
+def test_gitlab_mrs_show(mock_manager):
+    """
+    Does mrs command run the manager's show method? (by default)
+    """
+    launch_cli('gitlab', 'mrs', 'some/project', '--label', 'foo')
+    assert mock_manager().show.called
+
+
 def test_gitlab_projects_command():
     """
     Is subcommand available?

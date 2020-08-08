@@ -3,19 +3,33 @@ Tests for concierge-cli's manager classes
 """
 from gitlab import Gitlab
 from gitlab.config import GitlabConfigMissingError
-from unittest.mock import patch
+from unittest.mock import call, patch
 from urllib3.exceptions import InsecureRequestWarning
 
 from concierge_cli.manager import (
     # GITLAB_DEFAULT_URI,
     GitlabAPI,
     GroupManager,
+    MergeRequestManager,
     ProjectManager,
     TopicManager,
 )
 
 TEST_URI = 'https://some.gitlab.host'
 TEST_TOKEN = '1234567890abcdefghijklmnopqrstuvwxyz'
+
+
+def mock_ref(iid):
+    return dict(full='mockedgroup/mockedproject!%s' % iid)
+
+
+class MergeRequestMock:
+    merge_status = 'can_be_merged'
+    references = mock_ref(42)
+    title = 'My mocked merge request'
+
+    def __init__(self, **kwargs):
+        self.__dict__.update(**kwargs)
 
 
 @patch.object(Gitlab, 'from_config')
@@ -144,6 +158,35 @@ def test_projectmanager_show(mock_project):
 
         project_manager.show()
         assert mock_manager_projects.called
+
+
+@patch('builtins.print')
+def test_mergerequestmanager_show(mock_print):
+    """
+    Does show() method call merge_requests() and prints all MRs?
+    """
+    with patch.object(MergeRequestManager, 'merge_requests', return_value=[
+        MergeRequestMock(title='Foo', references=mock_ref(3)),
+        MergeRequestMock(title='Bar', merge_status='cannot_be_merged'),
+        MergeRequestMock(title='Baz', references=mock_ref(17)),
+    ]) as mock_manager_merge_requests:
+
+        mr_manager = MergeRequestManager(
+            group_filter='',
+            project_filter='',
+            labels=[],
+            merge='no',
+        )
+        assert isinstance(mr_manager, GitlabAPI)
+
+        mr_manager.show()
+        assert mock_manager_merge_requests.called
+        assert mock_print.mock_calls == [
+            call('Open merge requests:'),
+            call('✓ mockedgroup/mockedproject!3: Foo'),
+            call('✗ mockedgroup/mockedproject!42: Bar'),
+            call('✓ mockedgroup/mockedproject!17: Baz'),
+        ]
 
 
 @patch('concierge_cli.adapter.GroupMembership')
