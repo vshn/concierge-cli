@@ -54,11 +54,31 @@ You can use Pipenv to work around this limitation:
 
 .. _python-gitlab: https://pypi.org/project/python-gitlab/
 
+Preparation
+-----------
+
+You need an `access token`_ of a GitLab user to access resources through the
+API. For groups and group membership this needs to be an administrator user.
+You may also want to `disable notifications`_ of the user(s) you plan to
+perform bulk updates on, to avoid sending out massive amounts of emails.
+
+.. _access token: https://gitlab.com/profile/personal_access_tokens
+.. _disable notifications: https://gitlab.com/profile/notifications
+
+Set the GitLab URI and TOKEN as environment variables (if you want to avoid
+using the ``--token`` and/or ``--uri`` options):
+
+.. code-block:: console
+
+    $ export CONCIERGE_GITLAB_URI=https://git.example.com/
+    $ export CONCIERGE_GITLAB_TOKEN=<redacted>
+
 Usage Patterns
 --------------
 
 #. Manage `project topics`_
 #. List projects by topic
+#. List (and merge) merge requests by project
 #. Manage `group membership`_ and permissions
 
 .. _project topics: https://docs.gitlab.com/ce/user/project/settings/
@@ -108,24 +128,19 @@ Update the list of modules Concierge manages with a specific configuration:
     $ git add -v configs/foo-bar/managed_modules.yml
     $ git status && git commit -m 'Added ...' && git push
 
-Group membership
-^^^^^^^^^^^^^^^^
+Merge requests
+^^^^^^^^^^^^^^
 
-**Preparation:** You need an `access token`_ of an administrator user to
-list all groups and make changes to any group membership. You may also want
-to `disable notifications`_ of the user(s) you plan to perform bulk updates
-on, to avoid sending out a massive amount of emails.
-
-.. _access token: https://gitlab.com/profile/personal_access_tokens
-.. _disable notifications: https://gitlab.com/profile/notifications
-
-Set the GitLab URI and TOKEN as environment variables (if you want to avoid
-using the ``--token`` and/or ``--uri`` options):
+List of all merge requests of a project, optionally matching labels:
 
 .. code-block:: console
 
-    $ export CONCIERGE_GITLAB_URI=https://git.example.com/
-    $ export CONCIERGE_GITLAB_TOKEN=<redacted>
+    $ concierge-cli gitlab mrs mygroup/myproject --label mylabel
+
+Add ``--merge yes`` to trigger merging all found requests.
+
+Group membership
+^^^^^^^^^^^^^^^^
 
 List all groups where user is not yet a member of:
 
