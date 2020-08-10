@@ -84,7 +84,7 @@ class MergeRequestManager(GitlabAPI):
     actions on them.
     """
 
-    def __init__(self, group_filter, project_filter, labels, merge,
+    def __init__(self, group_filter, project_filter, labels, merge_style,
                  uri=None, token=None, insecure=False):
         """
         A collection of merge requests filtered by group, project and topic(s).
@@ -93,7 +93,12 @@ class MergeRequestManager(GitlabAPI):
         self.group_filter = group_filter
         self.project_filter = project_filter
         self.labels = labels
-        self.merge = merge
+        self.merged_count = 0
+        self.merge_executor = {
+            'no': None,
+            'yes': self.confirm_and_merge,
+            'automatic': self.merge_directly,
+        }[merge_style]
 
     def merge_requests(self):
         """
@@ -118,10 +123,45 @@ class MergeRequestManager(GitlabAPI):
         else:
             print("Open merge requests:")
 
-        # pylint: disable=invalid-name
-        for mr in self.merge_requests():
-            print(f"{'✓' if mr.merge_status == 'can_be_merged' else '✗'}"
-                  f" {mr.references['full']}: {mr.title}")
+        for merge_request in self.merge_requests():
+            status = '✓' if merge_request.merge_status == 'can_be_merged' \
+                     else '✗'
+            print(f"{status} {merge_request.references['full']}:"
+                  f" {merge_request.title}")
+
+    def merge_all(self):
+        """Merge all identified merge requests."""
+        if self.labels:
+            print("Merging merge requests that match labels: %s" %
+                  ",".join(self.labels))
+        else:
+            print("Merging merge requests:")
+
+        for merge_request in self.merge_requests():
+            if merge_request.merge_status == 'can_be_merged':
+                self.merge_executor(merge_request)
+            else:
+                print(f"Ignoring {merge_request.references['full']}:"
+                      f" {merge_request.title} ✗ Can't be merged")
+
+        count = self.merged_count if self.merged_count else 'No'
+        print(f"{count} MRs merged.")
+
+    def confirm_and_merge(self, merge_request):
+        """Ask for confirmation interactively, then merge the MR."""
+        choice = input("Proceed with merging"
+                       f" ✓ {merge_request.references['full']}:"
+                       f" {merge_request.title} ? (y/n) [n] ")
+        if choice == 'y':
+            merge_request.merge()
+            self.merged_count += 1
+
+    def merge_directly(self, merge_request):
+        """Merge MR without prior confirmation."""
+        print(f"Merging {merge_request.references['full']}:"
+              f" {merge_request.title}")
+        merge_request.merge()
+        self.merged_count += 1
 
 
 class ProjectManager(GitlabAPI):

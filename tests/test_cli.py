@@ -106,6 +106,27 @@ def test_gitlab_mrs_show(mock_manager):
     """
     launch_cli('gitlab', 'mrs', 'some/project', '--label', 'foo')
     assert mock_manager().show.called
+    assert not mock_manager().merge_all.called
+
+
+@patch('concierge_cli.cli.MergeRequestManager')
+def test_gitlab_mrs_merge_yes(mock_manager):
+    """
+    Does mrs --merge=yes trigger the manager's merge_all method?
+    """
+    launch_cli('gitlab', 'mrs', 'some/project', '--merge', 'yes')
+    assert mock_manager().merge_all.called
+    assert not mock_manager().show.called
+
+
+@patch('concierge_cli.cli.MergeRequestManager')
+def test_gitlab_mrs_merge_automatic(mock_manager):
+    """
+    Does mrs --merge=automatic trigger the manager's merge_all method?
+    """
+    launch_cli('gitlab', 'mrs', 'some/project', '--merge', 'automatic')
+    assert mock_manager().merge_all.called
+    assert not mock_manager().show.called
 
 
 def test_gitlab_projects_command():

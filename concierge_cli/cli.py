@@ -111,9 +111,12 @@ def mrs(ctx, group_project_filter, label, merge):
         group_filter=group_filter,
         project_filter=project_filter,
         labels=list(label),
-        merge=merge,
+        merge_style=merge,
     )
-    mr_manager.show()
+    if merge in ['yes', 'automatic']:
+        mr_manager.merge_all()
+    else:
+        mr_manager.show()
 
 
 @gitlab.command()
@@ -164,7 +167,6 @@ def groups(ctx, username, group_filter, member, set_permission):
     """
     Manage the access level for a user on GitLab groups.
     """
-
     group_manager = GroupManager(
         uri=ctx.obj.get('uri'),
         token=ctx.obj.get('token'),
