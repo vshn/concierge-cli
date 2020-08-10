@@ -149,7 +149,7 @@ class MergeRequestManager(GitlabAPI):
 
     def confirm_and_merge(self, merge_request):
         """Ask for confirmation interactively, then merge the MR."""
-        choice = input("Proceed with merging"
+        choice = input("Proceed with merging"  # nosec
                        f" ✓ {merge_request.references['full']}:"
                        f" {merge_request.title} ? (y/n) [n] ")
         if choice == 'y':
