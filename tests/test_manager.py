@@ -31,6 +31,9 @@ class MergeRequestMock:
     def __init__(self, **kwargs):
         self.__dict__.update(**kwargs)
 
+    def merge(self):
+        pass
+
 
 @patch.object(Gitlab, 'from_config')
 @patch('gitlab.Gitlab')
@@ -174,7 +177,7 @@ def test_mergerequestmanager_show(mock_manager_merge_requests, mock_print):
         group_filter='',
         project_filter='',
         labels=[],
-        merge='no',
+        merge_style='no',
     )
     assert isinstance(mr_manager, GitlabAPI)
 
@@ -185,6 +188,73 @@ def test_mergerequestmanager_show(mock_manager_merge_requests, mock_print):
         call('✓ mockedgroup/mockedproject!3: Foo'),
         call('✗ mockedgroup/mockedproject!42: Bar'),
         call('✓ mockedgroup/mockedproject!17: Baz'),
+    ]
+
+
+@patch('builtins.print')
+@patch('builtins.input', return_value='y')
+@patch.object(MergeRequestMock, 'merge')
+@patch.object(MergeRequestManager, 'merge_requests', return_value=[
+    MergeRequestMock(title='Foo', references=mock_ref(3)),
+    MergeRequestMock(title='Bar', merge_status='cannot_be_merged'),
+    MergeRequestMock(title='Baz', references=mock_ref(17)),
+])
+def test_mergerequestmanager_merge_yes(mock_manager_merge_requests,
+                                       mock_merge, mock_input, mock_print):
+    """
+    Does merge_all() method call merge_requests() and input() and print()?
+    """
+    mr_manager = MergeRequestManager(
+        group_filter='',
+        project_filter='',
+        labels=[],
+        merge_style='yes',
+    )
+    assert isinstance(mr_manager, GitlabAPI)
+
+    mr_manager.merge_all()
+    assert mock_manager_merge_requests.called
+    assert mock_input.mock_calls == [
+        call('Proceed with merging ✓ mockedgroup/mockedproject!3: Foo ? (y/n) [n] '),  # noqa
+        call('Proceed with merging ✓ mockedgroup/mockedproject!17: Baz ? (y/n) [n] '),  # noqa
+    ]
+    assert mock_merge.called
+    assert mock_print.mock_calls == [
+        call('Merging merge requests:'),
+        call("Ignoring mockedgroup/mockedproject!42: Bar ✗ Can't be merged"),
+        call('2 MRs merged.'),
+    ]
+
+
+@patch('builtins.print')
+@patch.object(MergeRequestMock, 'merge')
+@patch.object(MergeRequestManager, 'merge_requests', return_value=[
+    MergeRequestMock(title='Foo', references=mock_ref(3)),
+    MergeRequestMock(title='Bar', merge_status='cannot_be_merged'),
+    MergeRequestMock(title='Baz', references=mock_ref(17)),
+])
+def test_mergerequestmanager_merge_automatic(mock_manager_merge_requests,
+                                             mock_merge, mock_print):
+    """
+    Does merge_all() method call merge_requests() and input() and print()?
+    """
+    mr_manager = MergeRequestManager(
+        group_filter='',
+        project_filter='',
+        labels=[],
+        merge_style='automatic',
+    )
+    assert isinstance(mr_manager, GitlabAPI)
+
+    mr_manager.merge_all()
+    assert mock_manager_merge_requests.called
+    assert mock_merge.called
+    assert mock_print.mock_calls == [
+        call('Merging merge requests:'),
+        call('Merging mockedgroup/mockedproject!3: Foo'),
+        call("Ignoring mockedgroup/mockedproject!42: Bar ✗ Can't be merged"),
+        call('Merging mockedgroup/mockedproject!17: Baz'),
+        call('2 MRs merged.'),
     ]
 
 
