@@ -168,3 +168,10 @@ Remove a user from selected groups:
     $ concierge-cli gitlab groups my.user.name \
                            --group-filter a-group-name \
                            --set-permission none
+
+Found a bug? Need a new feature?
+--------------------------------
+
+Please see our `Contribution Guide`_ if you want to help out!
+
+.. _Contribution Guide: CONTRIBUTING.md
