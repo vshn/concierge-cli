@@ -20,11 +20,12 @@ def concierge_cli():
 
 @concierge_cli.group()
 @click.option('--uri', envvar='CONCIERGE_GITLAB_URI',
-              help='Location of the GitLab host (default: %s). Alternatively,'
-                   ' you may set the CONCIERGE_GITLAB_URI environment'
-                   ' variable, or specify a host in a configuration file (see'
+              default=GITLAB_DEFAULT_URI, show_default=True,
+              help='Location of the GitLab host. Alternatively, you may set'
+                   ' the CONCIERGE_GITLAB_URI environment variable, or'
+                   ' specify a host in a configuration file (see'
                    ' https://python-gitlab.readthedocs.io > CLI usage >'
-                   ' Configuration > Files).' % GITLAB_DEFAULT_URI)
+                   ' Configuration > Files).')
 @click.option('--token', envvar='CONCIERGE_GITLAB_TOKEN',
               help='Optional access token (access is anonymous if none is'
                    ' supplied). Alternatively, you may set the'
