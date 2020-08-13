@@ -74,6 +74,24 @@ def test_gitlab_groups_set(mock_manager):
 
 
 @patch('concierge_cli.cli.GroupManager')
+def test_gitlab_envvar_defaults(mock_manager):
+    """
+    Are env variable defaults used if set the related values?
+    """
+    expected_call = call(
+        group_filter='', insecure=False, is_member=False,
+        token='secret-access-token',
+        uri=concierge_cli.constants.GITLAB_DEFAULT_URI,
+        username='my.user.name')
+
+    with EnvironContext(CONCIERGE_GITLAB_TOKEN='secret-access-token'), \
+            EnvironContext(CONCIERGE_GITLAB_URI=None):
+        launch_cli('gitlab', 'groups', '--no-member', 'my.user.name')
+
+    assert mock_manager.mock_calls[0] == expected_call
+
+
+@patch('concierge_cli.cli.GroupManager')
 def test_gitlab_envvars(mock_manager):
     """
     Do env variables set the related values?
