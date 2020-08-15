@@ -3,7 +3,7 @@ Tests for concierge-cli's manager classes
 """
 from gitlab import Gitlab
 from gitlab.config import GitlabConfigMissingError
-from unittest.mock import call, patch
+from unittest.mock import call, patch, Mock
 from urllib3.exceptions import InsecureRequestWarning
 
 from concierge_cli.manager import (
@@ -19,12 +19,21 @@ TEST_URI = 'https://some.gitlab.host'
 TEST_TOKEN = '1234567890abcdefghijklmnopqrstuvwxyz'
 
 
+def mock_pipelines(*statuses):
+    """Fake implementation for ``merge_request.pipelines()``."""
+    return Mock(return_value=[dict(status=status) for status in statuses])
+
+
 def mock_ref(iid):
-    return dict(full='mockedgroup/mockedproject!%s' % iid)
+    """Fake ``references`` field of merge request API answer."""
+    return dict(full=f"mockedgroup/mockedproject!{iid}", short=f"!{iid}")
 
 
 class MergeRequestMock:
+    """Fake merge request API object."""
+    labels = []
     merge_status = 'can_be_merged'
+    pipelines = mock_pipelines('success', 'failed')
     references = mock_ref(42)
     title = 'My mocked merge request'
 
@@ -167,7 +176,7 @@ def test_projectmanager_show(mock_project):
 @patch.object(MergeRequestManager, 'merge_requests', return_value=[
     MergeRequestMock(title='Foo', references=mock_ref(3)),
     MergeRequestMock(title='Bar', merge_status='cannot_be_merged'),
-    MergeRequestMock(title='Baz', references=mock_ref(17)),
+    MergeRequestMock(title='Baz', references=mock_ref(17), pipelines=mock_pipelines('failed')),  # noqa
 ])
 def test_mergerequestmanager_show(mock_manager_merge_requests, mock_print):
     """
@@ -184,10 +193,10 @@ def test_mergerequestmanager_show(mock_manager_merge_requests, mock_print):
     mr_manager.show()
     assert mock_manager_merge_requests.called
     assert mock_print.mock_calls == [
-        call('Open merge requests:'),
-        call('✓ mockedgroup/mockedproject!3: Foo'),
-        call('✗ mockedgroup/mockedproject!42: Bar'),
-        call('✓ mockedgroup/mockedproject!17: Baz'),
+        call('Open merge requests: (mergeable, pipeline status)'),
+        call('✓✓ mockedgroup/mockedproject!3: Foo'),
+        call('✗✓ mockedgroup/mockedproject!42: Bar'),
+        call('✓✗ mockedgroup/mockedproject!17: Baz'),
     ]
 
 
@@ -197,7 +206,7 @@ def test_mergerequestmanager_show(mock_manager_merge_requests, mock_print):
 @patch.object(MergeRequestManager, 'merge_requests', return_value=[
     MergeRequestMock(title='Foo', references=mock_ref(3)),
     MergeRequestMock(title='Bar', merge_status='cannot_be_merged'),
-    MergeRequestMock(title='Baz', references=mock_ref(17)),
+    MergeRequestMock(title='Baz', references=mock_ref(17), pipelines=mock_pipelines('failed')),  # noqa
 ])
 def test_mergerequestmanager_merge_yes(mock_manager_merge_requests,
                                        mock_merge, mock_input, mock_print):
@@ -215,14 +224,14 @@ def test_mergerequestmanager_merge_yes(mock_manager_merge_requests,
     mr_manager.merge_all()
     assert mock_manager_merge_requests.called
     assert mock_input.mock_calls == [
-        call('Proceed with merging ✓ mockedgroup/mockedproject!3: Foo ? (y/n) [n] '),  # noqa
-        call('Proceed with merging ✓ mockedgroup/mockedproject!17: Baz ? (y/n) [n] '),  # noqa
+        call('Proceed with merging ✓✓ mockedgroup/mockedproject!3: Foo ? (y/n) [n] '),  # noqa
     ]
     assert mock_merge.called
     assert mock_print.mock_calls == [
         call('Merging merge requests:'),
         call("Ignoring mockedgroup/mockedproject!42: Bar ✗ Can't be merged"),
-        call('2 MRs merged.'),
+        call('Skipping mockedgroup/mockedproject!17: Baz ✗ Pipeline not succeeded'),  # noqa
+        call('1 MRs merged.'),
     ]
 
 
@@ -231,7 +240,7 @@ def test_mergerequestmanager_merge_yes(mock_manager_merge_requests,
 @patch.object(MergeRequestManager, 'merge_requests', return_value=[
     MergeRequestMock(title='Foo', references=mock_ref(3)),
     MergeRequestMock(title='Bar', merge_status='cannot_be_merged'),
-    MergeRequestMock(title='Baz', references=mock_ref(17)),
+    MergeRequestMock(title='Baz', references=mock_ref(17), pipelines=mock_pipelines('failed')),  # noqa
 ])
 def test_mergerequestmanager_merge_automatic(mock_manager_merge_requests,
                                              mock_merge, mock_print):
@@ -253,8 +262,8 @@ def test_mergerequestmanager_merge_automatic(mock_manager_merge_requests,
         call('Merging merge requests:'),
         call('Merging mockedgroup/mockedproject!3: Foo'),
         call("Ignoring mockedgroup/mockedproject!42: Bar ✗ Can't be merged"),
-        call('Merging mockedgroup/mockedproject!17: Baz'),
-        call('2 MRs merged.'),
+        call('Skipping mockedgroup/mockedproject!17: Baz ✗ Pipeline not succeeded'),  # noqa
+        call('1 MRs merged.'),
     ]
 
 
