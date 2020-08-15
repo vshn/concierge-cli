@@ -4,21 +4,13 @@ Tests for concierge-cli's command line interface (CLI)
 import os
 import pytest
 
-from cli_test_helpers import EnvironContext
+from cli_test_helpers import ArgvContext, EnvironContext
 from click.testing import CliRunner
 from gitlab.exceptions import GitlabError
 from requests.exceptions import RequestException
 from unittest.mock import call, patch
 
 import concierge_cli.cli
-
-
-def test_runas_module():
-    """
-    Can this package be run as a Python module?
-    """
-    exit_status = os.system('python -m concierge_cli')
-    assert exit_status == 0
 
 
 def launch_cli(*args):
@@ -29,6 +21,14 @@ def launch_cli(*args):
     runner = CliRunner()
     result = runner.invoke(concierge_cli.cli.concierge_cli, args)
     return result
+
+
+def test_runas_module():
+    """
+    Can this package be run as a Python module?
+    """
+    exit_status = os.system('python -m concierge_cli')
+    assert exit_status == 0
 
 
 def test_entrypoint():
@@ -214,4 +214,14 @@ def test_handle_other_errors(mock_cli):
     Are any other exceptions handled correctly? (catch + print + exit)
     """
     with pytest.raises(SystemExit):
+        concierge_cli.cli.main()
+
+
+@patch('concierge_cli.cli.MergeRequestManager', side_effect=RuntimeError)
+def test_debug_option(mock_manager, capsys):
+    """
+    Does --debug show a full stacktrace instead of a short error message?
+    """
+    with ArgvContext('concierge-cli', '--debug', 'gitlab', 'mrs'), \
+            pytest.raises(RuntimeError):
         concierge_cli.cli.main()

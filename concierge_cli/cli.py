@@ -13,9 +13,12 @@ from .manager import (
 
 
 @click.group()
+@click.option('--debug', is_flag=True,
+              help='Show debug information on errors.')
 @click.version_option()
-def concierge_cli():
+def concierge_cli(debug=False):
     """Concierge repository projects management CLI."""
+    abort.debug = debug
 
 
 @concierge_cli.group()
@@ -182,16 +185,23 @@ def groups(ctx, username, group_filter, member, set_permission):
         group_manager.show()
 
 
+def abort(error, message):
+    """Print an error and stops program execution."""
+    if abort.debug:
+        raise error
+    raise SystemExit(f"{message}. Aborting. (Try --debug)")
+
+
 def main():
-    """Main entry point for the CLI"""
+    """Main entry point for the CLI."""
     try:
         concierge_cli()
     except GitlabError as err:
-        raise SystemExit('%s 💣 GitLab error. Aborting.' % err.error_message)
+        abort(err, '%s 💣 GitLab error' % err.error_message)
     except RequestException as req:
-        raise SystemExit('%s 💣 Communication error. Aborting.' % req)
-    except Exception as other:
-        raise SystemExit('%s 💣 Application error. Aborting.' % other)
+        abort(req, '%s 💣 Communication error' % req)
+    except Exception as other:  # pylint: disable=broad-except
+        abort(other, '%s 💣 Application error' % other)
 
 
 if __name__ == '__main__':
