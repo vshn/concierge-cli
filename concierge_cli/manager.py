@@ -118,8 +118,8 @@ class MergeRequestManager(GitlabAPI):
     def show(self):
         """Display all merge requests found with some status information."""
         if self.labels:
-            print("Open merge requests matching labels: %s" %
-                  ",".join(self.labels))
+            print("Open merge requests matching labels: [%s]" %
+                  "][".join(self.labels))
         else:
             print("Open merge requests: (mergeable, pipeline status)")
 
@@ -138,8 +138,8 @@ class MergeRequestManager(GitlabAPI):
     def merge_all(self):
         """Merge all identified merge requests."""
         if self.labels:
-            print("Merging merge requests that match labels: %s" %
-                  ",".join(self.labels))
+            print("Merging merge requests that match labels: [%s]" %
+                  "][".join(self.labels))
         else:
             print("Merging merge requests:")
 
@@ -166,14 +166,17 @@ class MergeRequestManager(GitlabAPI):
                        f" ✓✓ {merge_request.references['full']}:"
                        f" {merge_request.title} ? (y/n) [n] ")
         if choice == 'y':
-            merge_request.merge()
-            self.merged_count += 1
+            self._merge(merge_request)
 
     def merge_directly(self, merge_request):
         """Merge MR without prior confirmation."""
         print(f"Merging {merge_request.references['full']}:"
               f" {merge_request.title}")
-        merge_request.merge()
+        self._merge(merge_request)
+
+    def _merge(self, merge_request):
+        """Triggers the low-level merge API call."""
+        merge_request.merge(should_remove_source_branch=True)
         self.merged_count += 1
 
 
