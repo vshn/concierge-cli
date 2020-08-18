@@ -221,7 +221,16 @@ def test_handle_other_errors(mock_cli):
 def test_debug_option(mock_manager, capsys):
     """
     Does --debug show a full stacktrace instead of a short error message?
+    Can it be placed at any position in the argument list?
     """
+    with ArgvContext('concierge-cli', 'gitlab', 'mrs', '--debug'), \
+            pytest.raises(RuntimeError), pytest.raises(SystemExit):
+        concierge_cli.cli.main()
+
+    with ArgvContext('concierge-cli', 'gitlab', '--debug', 'mrs'), \
+            pytest.raises(RuntimeError), pytest.raises(SystemExit):
+        concierge_cli.cli.main()
+
     with ArgvContext('concierge-cli', '--debug', 'gitlab', 'mrs'), \
-            pytest.raises(RuntimeError):
+            pytest.raises(RuntimeError), pytest.raises(SystemExit):
         concierge_cli.cli.main()
