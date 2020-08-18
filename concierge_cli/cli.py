@@ -50,7 +50,7 @@ def concierge_cli():
               help='Optional access token (access is anonymous if none is'
                    ' supplied). Alternatively, you may set the'
                    ' CONCIERGE_GITLAB_TOKEN environment variable.')
-@click.option('--insecure/--secure',
+@click.option('--insecure', is_flag=True, default=False,
               help='Disable SSL certificate check and related warnings.')
 @debug_option()
 def gitlab(ctx, uri, token, insecure):
@@ -226,7 +226,6 @@ def abort(error, message):
 
 
 abort.debug = False
-
 
 if __name__ == '__main__':
     main()
