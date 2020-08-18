@@ -12,16 +12,33 @@ from .manager import (
 )
 
 
+def debug_option(*_, **kwargs):
+    """
+    Add a ``--debug`` option to print out a stacktrace when an error occurs.
+    """
+
+    def callback(ctx, _, value):
+        if not value or ctx.resilient_parsing:
+            return
+
+        abort.debug = True
+
+    kwargs.setdefault("is_flag", True)
+    kwargs.setdefault("expose_value", False)
+    kwargs.setdefault("help", "Show debug information on errors.")
+    kwargs["callback"] = callback
+    return click.decorators.option("--debug", **kwargs)
+
+
 @click.group()
-@click.option('--debug', is_flag=True,
-              help='Show debug information on errors.')
 @click.version_option()
-def concierge_cli(debug=False):
+@debug_option()
+def concierge_cli():
     """Concierge repository projects management CLI."""
-    abort.debug = debug
 
 
 @concierge_cli.group()
+@click.pass_context
 @click.option('--uri', envvar='CONCIERGE_GITLAB_URI',
               default=GITLAB_DEFAULT_URI, show_default=True,
               help='Location of the GitLab host. Alternatively, you may set'
@@ -35,20 +52,21 @@ def concierge_cli(debug=False):
                    ' CONCIERGE_GITLAB_TOKEN environment variable.')
 @click.option('--insecure/--secure',
               help='Disable SSL certificate check and related warnings.')
-@click.pass_context
+@debug_option()
 def gitlab(ctx, uri, token, insecure):
     """GitLab sub-commands."""
     ctx.obj = dict(uri=uri, token=token, insecure=insecure)
 
 
 @gitlab.command()
+@click.pass_context
 @click.argument('group-project-filter', default='/')
 @click.option('--empty/--no-empty', default=False,
               help='Select projects with an empty (or non-empty) topic list.')
 @click.option('--set-topic', multiple=True,
               help='Use multiple times to set more than one topic.'
                    ' Use "" to clear topics.')
-@click.pass_context
+@debug_option()
 def topics(ctx, group_project_filter, empty, set_topic):
     """
     List and manage topics on GitLab projects.
@@ -82,6 +100,7 @@ def topics(ctx, group_project_filter, empty, set_topic):
 
 
 @gitlab.command()
+@click.pass_context
 @click.argument('group-project-filter', default='/')
 @click.option('--label', multiple=True,
               help='Use multiple times to filter with more than one label.')
@@ -89,7 +108,7 @@ def topics(ctx, group_project_filter, empty, set_topic):
               type=click.Choice(['yes', 'no', 'automatic']),
               help='Merge all identified merge requests. With "yes", will '
                    'ask for confirmation interactively on each MR.')
-@click.pass_context
+@debug_option()
 def mrs(ctx, group_project_filter, label, merge):
     """
     List and manage merge requests of GitLab projects.
@@ -124,10 +143,11 @@ def mrs(ctx, group_project_filter, label, merge):
 
 
 @gitlab.command()
+@click.pass_context
 @click.argument('group-project-filter', default='/')
 @click.option('--topic', multiple=True,
               help='Use multiple times to filter with more than one topic.')
-@click.pass_context
+@debug_option()
 def projects(ctx, group_project_filter, topic):
     """
     List projects on GitLab, optionally by topic.
@@ -158,6 +178,7 @@ def projects(ctx, group_project_filter, topic):
 
 
 @gitlab.command()
+@click.pass_context
 @click.argument('username')
 @click.option('--group-filter', default='',
               help='List only groups that match or contain a specific name.')
@@ -166,7 +187,7 @@ def projects(ctx, group_project_filter, topic):
 @click.option('--set-permission',
               type=click.Choice(GITLAB_PERMISSIONS.keys()),
               help='Set user permission level on all matching groups.')
-@click.pass_context
+@debug_option()
 def groups(ctx, username, group_filter, member, set_permission):
     """
     Manage the access level for a user on GitLab groups.
@@ -185,13 +206,6 @@ def groups(ctx, username, group_filter, member, set_permission):
         group_manager.show()
 
 
-def abort(error, message):
-    """Print an error and stops program execution."""
-    if abort.debug:
-        raise error
-    raise SystemExit(f"{message}. Aborting. (Try --debug)")
-
-
 def main():
     """Main entry point for the CLI."""
     try:
@@ -202,6 +216,16 @@ def main():
         abort(req, '%s 💣 Communication error' % req)
     except Exception as other:  # pylint: disable=broad-except
         abort(other, '%s 💣 Application error' % other)
+
+
+def abort(error, message):
+    """Print an error and stops program execution."""
+    if abort.debug:
+        raise error
+    raise SystemExit(f"{message}. Aborting. (Try --debug)")
+
+
+abort.debug = False
 
 
 if __name__ == '__main__':
