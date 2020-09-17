@@ -150,7 +150,7 @@ def mrs(ctx, group_project_filter, label, merge):
 @debug_option()
 def projects(ctx, group_project_filter, topic):
     """
-    List projects on GitLab, optionally by topic.
+    List projects on GitLab, optionally by topic, ignoring archived ones.
 
     Filter syntax:
 
