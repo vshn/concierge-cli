@@ -172,6 +172,40 @@ def test_projectmanager_show(mock_project):
         assert mock_manager_projects.called
 
 
+def test_projectmanager_projects_list_args():
+    """
+    Are groups.list() and group.projects.list() called with correct arguments?
+
+    1. Make `api.groups.list` return a list with a single item (a group)
+    2. Verify the call to `group.projects.list` uses the right arguments
+    """
+    mock_group = Mock()
+    mock_groups_list = Mock(return_value=[mock_group])
+    mock_projects_list = Mock(return_value=[])
+    mock_group.projects.list = mock_projects_list
+    mock_api = Mock()
+    mock_api.groups.list = mock_groups_list
+
+    project_manager = ProjectManager(
+        group_filter='foo',
+        project_filter='bar',
+        topic_list=[],
+        uri=TEST_URI,
+        token=TEST_TOKEN,
+        insecure=False,
+    )
+    project_manager.api = mock_api
+
+    list(project_manager.projects())
+
+    assert mock_groups_list.call_args_list == [
+        call(search='foo', all=True)
+    ]
+    assert mock_projects_list.call_args_list == [
+        call(search='bar', all=True, archived=False)
+    ]
+
+
 @patch('builtins.print')
 @patch.object(MergeRequestManager, 'merge_requests', return_value=[
     MergeRequestMock(title='Foo', references=mock_ref(3)),

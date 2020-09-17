@@ -202,7 +202,8 @@ class ProjectManager(GitlabAPI):
         """
         for group in self.api.groups.list(search=self.group_filter, all=True):
             for group_project in \
-                    group.projects.list(search=self.project_filter, all=True):
+                    group.projects.list(search=self.project_filter, all=True,
+                                        archived=False):
                 project = Project(self.api, group_project)
                 matched_tags = set(project.topic_list) & set(self.topic_list)
                 if matched_tags or not self.topic_list:
