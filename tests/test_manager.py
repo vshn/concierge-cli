@@ -175,14 +175,14 @@ def test_projectmanager_show(mock_project):
 def test_projectmanager_projects_list_args():
     """
     Are groups.list() and group.projects.list() called with correct arguments?
-
-    1. Make `api.groups.list` return a list with a single item (a group)
-    2. Verify the call to `group.projects.list` uses the right arguments
     """
-    mock_group = Mock()
-    mock_groups_list = Mock(return_value=[mock_group])
+    # skip the loop body by having `group.projects.list` return an empty list
     mock_projects_list = Mock(return_value=[])
+    mock_group = Mock()
     mock_group.projects.list = mock_projects_list
+
+    # trigger `group.projects.list` once by a list with only a single group
+    mock_groups_list = Mock(return_value=[mock_group])
     mock_api = Mock()
     mock_api.groups.list = mock_groups_list
 
