@@ -10,14 +10,15 @@ properties of your Git repository projects.  Currently, GitLab is supported.
 .. |latest-version| image:: https://img.shields.io/pypi/v/concierge-cli.svg
    :alt: Latest version on PyPI
    :target: https://pypi.org/project/concierge-cli
-.. |build-status| image:: https://img.shields.io/travis/vshn/concierge-cli/master.svg
-   :alt: Build status
-   :target: https://travis-ci.org/vshn/concierge-cli
+.. |checks-status| image:: https://img.shields.io/github/workflow/status/vshn/concierge-cli/Checks/master?label=Checks&logo=github
+   :alt: GitHub Workflow Status
+   :target: https://github.com/vshn/concierge-cli/actions?query=workflow%3AChecks
+.. |tests-status| image:: https://img.shields.io/github/workflow/status/vshn/concierge-cli/Tests/master?label=Tests&logo=github
+   :alt: GitHub Workflow Status
+   :target: https://github.com/vshn/concierge-cli/actions?query=workflow%3ATests
 .. |health| image:: https://img.shields.io/codacy/grade/363c38ca95b941438b442afb64591892/master.svg
    :target: https://www.codacy.com/app/VSHN/concierge-cli
    :alt: Code health
-.. |updates| image:: https://badges.renovateapi.com/github/vshn/concierge-cli
-   :alt: Updates
 .. |python-support| image:: https://img.shields.io/pypi/pyversions/concierge-cli.svg
    :alt: Python versions
    :target: https://pypi.org/project/concierge-cli
