@@ -1,7 +1,7 @@
 Concierge-cli |latest-version|
 ==============================
 
-|build-status| |health| |updates| |python-support| |license|
+|checks-status| |tests-status| |health| |python-support| |license|
 
 Companion CLI for `Concierge`_, the Configuration management & CI solution
 for aligning your multitude of Git repositories.  Allows you to bulk-manage
@@ -175,4 +175,5 @@ Found a bug? Need a new feature?
 
 Please see our `Contribution Guide`_ if you want to help out!
 
-.. _Contribution Guide: CONTRIBUTING.md
+.. _Contribution Guide:
+    https://github.com/vshn/concierge-cli/blob/master/CONTRIBUTING.md
