@@ -16,5 +16,5 @@ python-gitlab==2.5.0
     # via -r requirements.in
 requests==2.25.1
     # via python-gitlab
-urllib3==1.26.2
+urllib3==1.26.4
     # via requests
