@@ -12,7 +12,7 @@ click==7.1.2
     # via -r requirements.in
 idna==2.10
     # via requests
-python-gitlab==2.5.0
+python-gitlab==2.10.1
     # via -r requirements.in
 requests==2.25.1
     # via python-gitlab
