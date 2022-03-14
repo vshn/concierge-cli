@@ -1,18 +1,19 @@
 #!/usr/bin/env python3
 """
 Packaging setup for Concierge CLI.
-See: https://click.palletsprojects.com/en/7.x/setuptools/
+See: https://click.palletsprojects.com/en/8.0.x/setuptools/
 """
-from os.path import abspath, dirname, join
+from pathlib import Path
 from setuptools import find_packages, setup
 
 import concierge_cli as package
 
 
 def read_file(filename):
-    """Get the contents of a file"""
-    with open(join(abspath(dirname(__file__)), filename)) as file:
-        return file.read()
+    """Read a text file and return its contents."""
+    project_home = Path(__file__).parent.resolve()
+    file_path = project_home / filename
+    return file_path.read_text(encoding="utf-8")
 
 
 setup(
@@ -39,9 +40,13 @@ setup(
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9',
+        'Programming Language :: Python :: 3.10',
     ],
     python_requires='>=3.6',
-    install_requires=read_file('requirements.in'),
+    install_requires=[
+        'click',
+        'python-gitlab',
+    ],
     entry_points={
         'console_scripts': [
             'concierge-cli = concierge_cli.cli:main',
