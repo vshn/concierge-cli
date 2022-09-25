@@ -10,7 +10,7 @@ chardet==4.0.0
     # via requests
 click==7.1.2
     # via -r requirements.in
-idna==2.10
+idna==3.4
     # via requests
 python-gitlab==2.5.0
     # via -r requirements.in
