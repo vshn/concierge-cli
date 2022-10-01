@@ -15,7 +15,6 @@ def read_file(filename):
     file_path = project_home / filename
     return file_path.read_text(encoding="utf-8")
 
-
 setup(
     name=package.__name__.replace('_', '-'),
     version=package.__version__,
