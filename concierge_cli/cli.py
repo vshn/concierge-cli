@@ -211,11 +211,11 @@ def main():
     try:
         concierge_cli()
     except GitlabError as err:
-        abort(err, '%s 💣 GitLab error' % err.error_message)
+        abort(err, f'{err.error_message} 💣 GitLab error')
     except RequestException as req:
-        abort(req, '%s 💣 Communication error' % req)
+        abort(req, f'{req} 💣 Communication error')
     except Exception as other:  # pylint: disable=broad-except
-        abort(other, '%s 💣 Application error' % other)
+        abort(other, f'{other} 💣 Application error')
 
 
 def abort(error, message):

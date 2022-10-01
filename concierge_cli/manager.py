@@ -118,6 +118,7 @@ class MergeRequestManager(GitlabAPI):
     def show(self):
         """Display all merge requests found with some status information."""
         if self.labels:
+            # pylint: disable=consider-using-f-string
             print("Open merge requests matching labels: [%s]" %
                   "][".join(self.labels))
         else:
@@ -129,6 +130,7 @@ class MergeRequestManager(GitlabAPI):
                         'success' else '✗'
             mr_status = '✓' if merge_request.merge_status == \
                         'can_be_merged' else '✗'
+            # pylint: disable=consider-using-f-string
             mr_labels = ' [%s]' % ']['.join(merge_request.labels) \
                         if merge_request.labels else ''
             print(f"{mr_status}{pl_status}"
@@ -138,6 +140,7 @@ class MergeRequestManager(GitlabAPI):
     def merge_all(self):
         """Merge all identified merge requests."""
         if self.labels:
+            # pylint: disable=consider-using-f-string
             print("Merging merge requests that match labels: [%s]" %
                   "][".join(self.labels))
         else:
@@ -229,7 +232,7 @@ class GroupManager(GitlabAPI):
 
         users = self.api.users.list(username=username)
         if len(users) != 1:
-            raise ValueError('No such user: %s' % username)
+            raise ValueError(f'No such user: {username}')
 
         self.group_filter = group_filter
         self.user = users[0]
