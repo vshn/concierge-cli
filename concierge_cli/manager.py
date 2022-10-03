@@ -118,7 +118,8 @@ class MergeRequestManager(GitlabAPI):
     def show(self):
         """Display all merge requests found with some status information."""
         if self.labels:
-            print(f"Open merge requests matching labels: [{']['.join(self.labels)}]")
+            print("Open merge requests matching labels: "
+                  f"[{']['.join(self.labels)}]")
         else:
             print("Open merge requests: (mergeable, pipeline status)")
 
@@ -137,7 +138,8 @@ class MergeRequestManager(GitlabAPI):
     def merge_all(self):
         """Merge all identified merge requests."""
         if self.labels:
-            print(f"Merging merge requests that match labels: [{']['.join(self.labels)}]")
+            print("Merging merge requests that match labels: "
+                  f"[{']['.join(self.labels)}]")
         else:
             print("Merging merge requests:")
 
