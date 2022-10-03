@@ -137,9 +137,7 @@ class MergeRequestManager(GitlabAPI):
     def merge_all(self):
         """Merge all identified merge requests."""
         if self.labels:
-            # pylint: disable=consider-using-f-string
-            print("Merging merge requests that match labels: [%s]" %
-                  "][".join(self.labels))
+            print(f"Merging merge requests that match labels: [{']['.join(self.labels)}]")
         else:
             print("Merging merge requests:")
 
