@@ -118,9 +118,7 @@ class MergeRequestManager(GitlabAPI):
     def show(self):
         """Display all merge requests found with some status information."""
         if self.labels:
-            # pylint: disable=consider-using-f-string
-            print("Open merge requests matching labels: [%s]" %
-                  "][".join(self.labels))
+            print(f"Open merge requests matching labels: [{']['.join(self.labels)}]")
         else:
             print("Open merge requests: (mergeable, pipeline status)")
 
