@@ -128,8 +128,7 @@ class MergeRequestManager(GitlabAPI):
                         'success' else '✗'
             mr_status = '✓' if merge_request.merge_status == \
                         'can_be_merged' else '✗'
-            # pylint: disable=consider-using-f-string
-            mr_labels = ' [%s]' % ']['.join(merge_request.labels) \
+            mr_labels = f" [{']['.join(merge_request.labels)}]" \
                         if merge_request.labels else ''
             print(f"{mr_status}{pl_status}"
                   f" {merge_request.references['full']}:"
