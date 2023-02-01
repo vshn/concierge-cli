@@ -55,7 +55,7 @@ def concierge_cli():
 @debug_option()
 def gitlab(ctx, uri, token, insecure):
     """GitLab sub-commands."""
-    ctx.obj = dict(uri=uri, token=token, insecure=insecure)
+    ctx.obj = {"uri": uri, "token": token, "insecure": insecure}
 
 
 @gitlab.command()
