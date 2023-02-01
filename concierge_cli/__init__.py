@@ -4,5 +4,5 @@ Concierge repository projects management CLI.
 __author__ = 'VSHN AG'
 __email__ = 'tech@vshn.ch'
 __url__ = 'https://github.com/vshn/concierge-cli'
-__version__ = '1.7.1'
+__version__ = '1.7.2'
 __license__ = 'BSD-3-Clause'
