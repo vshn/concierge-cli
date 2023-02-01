@@ -205,8 +205,9 @@ class ProjectManager(GitlabAPI):
                     group.projects.list(search=self.project_filter, all=True,
                                         archived=False):
                 project = Project(self.api, group_project)
-                matched_tags = set(project.topic_list) & set(self.topic_list)
-                if matched_tags or not self.topic_list:
+                topics_match = set(project.topic_list) \
+                    & set(self.topic_list) == set(self.topic_list)
+                if topics_match or not self.topic_list:
                     yield project
 
     def show(self):
