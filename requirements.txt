@@ -20,5 +20,5 @@ requests==2.28.2
     #   requests-toolbelt
 requests-toolbelt==0.10.1
     # via python-gitlab
-urllib3==1.26.15
+urllib3==2.0.6
     # via requests
